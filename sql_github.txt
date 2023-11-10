@@ -1,0 +1,271 @@
+---Create table
+
+create table sam2
+(
+emp_id number(8) not null,
+emp_name varchar2(30) not null,
+age number(3) check (age>=18),
+constraints pk_sam2 primary key(emp_id),
+city_id number(4) references city(city_id)
+);
+
+desc sam1;
+
+
+--Create table with foriegn table
+
+create table city1
+(
+city_id number(4),
+city_name varchar2(20)
+);
+
+---------Insert some value
+
+insert into city1 values(10,'salem');
+insert into city1 values(20,'cbe');
+insert into city1 values(30,'chennai');
+insert into city1 values(40,'theni');
+
+alter table city1 add primary key(city_id);
+
+
+--Select all the values 
+
+select * from employees;
+
+select employee_id, first_name, last_name from employees;
+
+select concat(first_name,last_name) from employees;
+
+
+-----------Fetch unique records 
+
+select distinct department_id from employees;
+
+---------count the value
+
+select count(department_id) from employees;
+
+select count(distinct department_id) from employees;
+
+----Count all columns
+
+select count(*) from employees;
+
+----where  clause
+
+select * from employees where employee_id > 100;
+select * from employees where employee_id >= 100;
+select * from employees where employee_id < 100;
+select * from employees where employee_id <= 100;
+
+---------AND
+
+select * from employees where employee_id > 100 and employee_id <200;
+
+---------OR
+
+select * from employees where employee_id > 100 or employee_id <200;
+
+----------Between
+
+select * from employees where salary between 1000 and 5000;
+
+----------not Between
+
+select * from employees where salary not between 1000 and 5000;
+
+---fetch multiple values using IN
+
+select * from employees where department_id in (20,30,40);
+
+---fetch multiple values using NOT IN
+
+select * from employees where department_id not in (20,30,40);
+
+-----fetch 1st five record
+
+select * from employees where rownum <=5;
+
+
+-----NULL, blank 
+
+select count(*) from employees where employee_id is null;
+
+----to split the year
+
+select employee_id ,hire_date , to_char(hire_date,'YYYY') from employees;
+
+------------------Pattern match start with A
+
+select * from employees where first_name like 'A%';
+----------- name end with s
+select * from employees where first_name like '%s';
+
+----inbetween character
+
+select * from employees where first_name like '%an%';
+
+select * from employees where first_name like 'A_____%';
+
+
+---------ORDER BY
+
+select * from employees order by first_name;
+
+select * from employees order by first_name asc;
+
+select * from employees order by salary;
+
+select * from employees order by first_name;
+
+-------------Order by 8th column
+
+select * from employees order by 8;
+
+-----Single row function
+
+select upper(first_name) from employees;
+
+
+select length(first_name) from employees;
+
+
+select lower(first_name) from employees;
+
+------remove left side space
+
+select LTRIM('first_name') from employees;
+
+select RTRIM('first_name') from employees;
+
+select TRIM('first_name') from employees;
+
+------case
+
+select employee_id, first_name,salary,
+
+case
+when salary < 5000 then 'Low salary'
+when salary > 5000 then 'Avg salary'
+else 'high salary' end salary_status
+from employees;
+
+
+--joins
+
+select * from employees;
+
+select * from departments;
+
+select e.employee_id, e.first_name, d.department_name
+from employees e
+join
+departments d
+on
+e.department_id = d.department_id;
+
+--left  join
+
+select e.employee_id, e.first_name, d.department_name
+from employees e
+left join
+departments d
+on
+e.department_id = d.department_id;
+
+----right join
+
+select e.employee_id, e.first_name, d.department_name
+from employees e
+right join
+departments d
+on
+e.department_id = d.department_id;
+
+-------------Aggregate function
+
+select max(salary) from employees; 
+select min(salary) from employees; 
+select sum(salary) from employees; 
+select count(salary) from employees; 
+select avg(salary) from employees; 
+
+----------group by
+
+select sum(salary) from employees group by department_id;
+
+------having 
+
+select department_id, sum(salary) from employees
+group by department_id
+having sum(salary)>5000;
+
+-------------------------------------------------------
+
+create procedure samantha1
+as
+select department_id, sum(salary) from employees
+group by department_id
+having sum(salary)>5000;
+go;
+
+exec samantha1;
+
+
+-------------------------------------
+select * from employees_union_1
+UNION
+select * from employees_union_2;
+
+--------------------------------------------------------
+
+select employee_id, first_name,salary, sum(salary) over() from employees;
+
+select employee_id, first_name,salary, department_id,
+row_number() over( order by salary desc)as rnk from employees;
+
+
+-----------------------------------------------------------------------------------------
+select * from(
+select employee_id, first_name,salary, department_id,
+row_number() over( order by salary desc)as rnk from employees )where rnk<=5; 
+
+-----------------------------------------------------------------
+select * from(
+select employee_id, first_name,salary, department_id,
+rank() over( order by salary desc)as rnk from employees )where rnk=3; 
+
+select * from(
+select employee_id,first_name,salary,department_id,
+rank() over(partition by department_id order by salary desc) as rnk1 from employees) where rnk1=3
+
+--------------------------------------------------------------------
+
+select
+e.*,d.department_name
+
+from
+
+(
+select employee_id, first_name,salary, department_id,
+rank() over( order by salary desc)as rnk from employees)e inner join departments d 
+on e.department_id = d.department_id where rnk=3; 
+
+
+------------views
+
+create or replace view rest_table
+as
+select employee_id, first_name, salary
+from employees where employee_id > 5;
+
+select * from rest_table;
+
+
+
+
+
+
+
